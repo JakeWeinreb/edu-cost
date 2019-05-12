@@ -1,0 +1,29 @@
+---
+title: "edu-cost"
+author: "Jake Weinreb"
+date: "5/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE)
+```
+
+```{r libraries}
+library(tidyverse)
+library(janitor)
+library(readr)
+```
+
+## Distance Education and Retention Rates
+
+```{r upload}
+setwd("/Users/jakeweinreb/Desktop/R/Data/Education/")
+retention_raw <- read_csv("retention.csv") %>% clean_names()
+```
+
+```{r filter}
+retention_filtered <- 
+```
+
+
