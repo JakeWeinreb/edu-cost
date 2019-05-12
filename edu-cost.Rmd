@@ -21,33 +21,43 @@ library(rebus)
 ```{r upload}
 setwd("/Users/jakeweinreb/Desktop/R/Data/Education/")
 institution <- read_csv("institution.csv") %>% clean_names() %>% filter(instcat_hd2017 == 2)
-retention_raw <- read_csv("retention.csv") %>% clean_names() %>% filter(unit_id %in% institution$unit_id) %>% 
+retention_raw <- read_csv("retention.csv") %>% clean_names() %>% select(-x33) %>% 
+  filter(unit_id %in% institution$unit_id) %>% 
   gather(key = full_year, value = full, contains("ret_pcf_ef")) %>% 
   gather(key = part_year, value = part, contains("ret_pcp_ef")) %>% 
   gather(key = exclusive_year, value = exclusive, contains("pctdeexc_drvef")) %>% 
   gather(key = some_year, value = some, contains("pctdesom_drvef")) %>% 
   gather(key = none_year, value = none, contains("pctdenon_drvef")) %>% 
-  mutate(full_year = str_extract_all(full_year, DGT),
-         part_year = str_extract_all(part_year, DGT),
-         exclusive_year = str_extract_all(exclusive_year, DGT),
-         some_year = str_extract(some_year, DGT),
-         none_year = str_extract(none_year, DGT)) #takes a while (~10 mins)
+  mutate(full_year = str_extract(full_year, one_or_more(DGT)),
+         part_year = str_extract(part_year, one_or_more(DGT)),
+         exclusive_year = str_extract(exclusive_year, one_or_more(DGT)),
+         some_year = str_extract(some_year, one_or_more(DGT)),
+         none_year = str_extract(none_year, one_or_more(DGT))) #takes a while (~10 mins)
 ```
 
-```{r filter}
-retention_filtered <- filter(retention_raw, unit_id %in% institution)
+```{r upload}
+setwd("/Users/jakeweinreb/Desktop/R/Data/Education/")
+institution <- read_csv("institution.csv") %>% clean_names() %>% filter(instcat_hd2017 == 2)
+retention_raw <- read_csv("retention.csv") %>% clean_names() %>% select(-x33) %>% 
+  filter(unit_id %in% institution$unit_id) %>% 
+  gather(key = year, value = full, contains("ret_pcf_ef")) %>% 
+  gather(key = part_year, value = part, contains("ret_pcp_ef")) %>% 
+  gather(key = exclusive_year, value = exclusive, contains("pctdeexc_drvef")) %>% 
+  gather(key = some_year, value = some, contains("pctdesom_drvef")) %>% 
+  gather(key = none_year, value = none, contains("pctdenon_drvef")) %>% 
+  unique() %>% 
+  mutate(full_year = str_extract(full_year, one_or_more(DGT)),
+         part_year = str_extract(part_year, one_or_more(DGT)),
+         exclusive_year = str_extract(exclusive_year, one_or_more(DGT)),
+         some_year = str_extract(some_year, one_or_more(DGT)),
+         none_year = str_extract(none_year, one_or_more(DGT))) #takes a while (~10 mins)
 ```
 
-```{r years}
-year_2017 <- select(retention_raw, unit_id, contains("7"))
-year_2016 <- select(retention_raw, unit_id, contains("6"))
-year_2015 <- select(retention_raw, unit_id, contains("5"))
-year_2014 <- select(retention_raw, unit_id, contains("4"))
-year_2013 <- select(retention_raw, unit_id, contains("3"))
-year_2012 <- select(retention_raw, unit_id, contains("2"))
+```{r sample}
+retention_sample <- sample_n(retention_raw, 1e6)
 ```
 
 ```{r}
-year_201 %>% filter(pctdeexc_drvef2017 == 0) %>% ggplot(aes(x = ret_pcf_ef2017d)) + geom_histogram()
+retention_sample %>% ggplot(aes(x = full, y = none, group = full_year)) + geom_point(alpha = .4)
 ```
 
