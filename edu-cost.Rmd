@@ -20,9 +20,18 @@ library(rebus)
 
 ```{r upload}
 setwd("/Users/jakeweinreb/Desktop/R/Data/Education/")
-retention_raw <- read_csv("retention.csv") %>% clean_names() %>% 
-  rename(case_when())
-
+institution <- read_csv("institution.csv") %>% clean_names() %>% filter(instcat_hd2017 == 2)
+retention_raw <- read_csv("retention.csv") %>% clean_names() %>% filter(unit_id %in% institution$unit_id) %>% 
+  gather(key = full_year, value = full, contains("ret_pcf_ef")) %>% 
+  gather(key = part_year, value = part, contains("ret_pcp_ef")) %>% 
+  gather(key = exclusive_year, value = exclusive, contains("pctdeexc_drvef")) %>% 
+  gather(key = some_year, value = some, contains("pctdesom_drvef")) %>% 
+  gather(key = none_year, value = none, contains("pctdenon_drvef")) %>% 
+  mutate(full_year = str_extract_all(full_year, DGT),
+         part_year = str_extract_all(part_year, DGT),
+         exclusive_year = str_extract_all(exclusive_year, DGT),
+         some_year = str_extract(some_year, DGT),
+         none_year = str_extract(none_year, DGT)) #takes a while (~10 mins)
 ```
 
 ```{r filter}
@@ -39,6 +48,6 @@ year_2012 <- select(retention_raw, unit_id, contains("2"))
 ```
 
 ```{r}
-year_2017 %>% filter(pctdeexc_drvef2017 == 0) %>% ggplot(aes(x = ret_pcf_ef2017d, y = pctdeexc_drvef2017)) + geom_point(alpha = .4)
+year_201 %>% filter(pctdeexc_drvef2017 == 0) %>% ggplot(aes(x = ret_pcf_ef2017d)) + geom_histogram()
 ```
 
