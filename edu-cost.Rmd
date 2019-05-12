@@ -6,24 +6,39 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FALSE)
 ```
 
 ```{r libraries}
 library(tidyverse)
 library(janitor)
 library(readr)
+library(rebus)
 ```
 
 ## Distance Education and Retention Rates
 
 ```{r upload}
 setwd("/Users/jakeweinreb/Desktop/R/Data/Education/")
-retention_raw <- read_csv("retention.csv") %>% clean_names()
+retention_raw <- read_csv("retention.csv") %>% clean_names() %>% 
+  rename(case_when())
+
 ```
 
 ```{r filter}
-retention_filtered <- 
+retention_filtered <- filter(retention_raw, unit_id %in% institution)
 ```
 
+```{r years}
+year_2017 <- select(retention_raw, unit_id, contains("7"))
+year_2016 <- select(retention_raw, unit_id, contains("6"))
+year_2015 <- select(retention_raw, unit_id, contains("5"))
+year_2014 <- select(retention_raw, unit_id, contains("4"))
+year_2013 <- select(retention_raw, unit_id, contains("3"))
+year_2012 <- select(retention_raw, unit_id, contains("2"))
+```
+
+```{r}
+year_2017 %>% filter(pctdeexc_drvef2017 == 0) %>% ggplot(aes(x = ret_pcf_ef2017d, y = pctdeexc_drvef2017)) + geom_point(alpha = .4)
+```
 
