@@ -64,10 +64,9 @@ retention_raw %>% ggplot(aes(x = full, y = none, group = full_year)) + geom_poin
 ##Financial Statements
 
 ```{r financials_import}
-for_profit <- rbind(read_csv("finance_profit_current"), read_csv("finance_profit_historical")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
-private <- rbind(read_csv("finance_private_current"), read_csv("finance_private_current")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
-public <- rbind(read_csv("finance_public_current"), read_csv("finance_public_historical1"), read_csv("finance_public_historical2")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
+for_profit <- bind_cols(read_csv("finance_profit_current.csv"), read_csv("finance_profit_historical.csv")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
+private <- bind_cols(read_csv("finance_private_current.csv"), read_csv("finance_private_current.csv")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
+public <- bind_cols(read_csv("finance_public_current.csv"), read_csv("finance_public_historical1.csv"), read_csv("finance_public_historical2.csv")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
 ```
 
-ko
 
