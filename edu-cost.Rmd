@@ -36,12 +36,29 @@ retention_raw <- read_csv("retention.csv") %>% clean_names() %>% select(-x33) %>
   filter(full_year == part_year, part_year == exclusive_year, exclusive_year == some_year, some_year == none_year)
 ```
 
-```{r sample}
-retention_sample <- sample_n(retention_raw, 1e6)
+```{r remote_over_time}
+online_over_time <- retention_raw %>% select(full_year, exclusive, some, none) %>% group_by(full_year) %>%
+  summarize(avg_exclusive = mean(exclusive, na.rm = TRUE),
+            avg_some = mean(some, na.rm = TRUE),
+            avg_none = mean(none, na.rm = TRUE)) %>% 
+  gather(key = cat, value = avg, -full_year) 
+
+online_over_time %>% ggplot(aes(full_year, avg, color = cat, group = cat)) + geom_point() + geom_line()
 ```
 
-```{r}
-retention_sample %>% ggplot(aes(x = full, y = none, group = full_year)) + geom_point(alpha = .4)
+```{r num_remote}
+num_remote <- retention_raw %>% select(full_year, exclusive, none) %>% 
+  filter(exclusive == 100 | none == 100) %>% 
+  gather(key = cat, value = pct, -full_year) %>% 
+  filter(pct == 100) %>% 
+  group_by(full_year, cat) %>% 
+  tally()
+
+num_remote %>% ggplot(aes(full_year, n, fill = cat)) + geom_col(position = 'dodge')
+```
+
+```{r comparison_over_time}
+retention_raw %>% ggplot(aes(x = full, y = none, group = full_year)) + geom_point(alpha = .3) + facet_wrap(~full_year)
 ```
 
 ##Financial Statements
