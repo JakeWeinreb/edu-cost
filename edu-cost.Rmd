@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FALSE)
+knitr::opts_knit$set(root.dir = "/Users/jakeweinreb/Desktop/R/Data/Education/")
 ```
 
 ```{r libraries}
@@ -19,7 +20,6 @@ library(rebus)
 ## Distance Education and Retention Rates
 
 ```{r upload}
-setwd("/Users/jakeweinreb/Desktop/R/Data/Education/")
 institution <- read_csv("institution.csv") %>% clean_names() %>% filter(instcat_hd2017 == 2)
 retention_raw <- read_csv("retention.csv") %>% clean_names() %>% select(-x33) %>% 
   filter(unit_id %in% institution$unit_id) %>% 
@@ -28,29 +28,12 @@ retention_raw <- read_csv("retention.csv") %>% clean_names() %>% select(-x33) %>
   gather(key = exclusive_year, value = exclusive, contains("pctdeexc_drvef")) %>% 
   gather(key = some_year, value = some, contains("pctdesom_drvef")) %>% 
   gather(key = none_year, value = none, contains("pctdenon_drvef")) %>% 
-  mutate(full_year = str_extract(full_year, one_or_more(DGT)),
-         part_year = str_extract(part_year, one_or_more(DGT)),
-         exclusive_year = str_extract(exclusive_year, one_or_more(DGT)),
-         some_year = str_extract(some_year, one_or_more(DGT)),
-         none_year = str_extract(none_year, one_or_more(DGT))) #takes a while (~10 mins)
-```
-
-```{r upload}
-setwd("/Users/jakeweinreb/Desktop/R/Data/Education/")
-institution <- read_csv("institution.csv") %>% clean_names() %>% filter(instcat_hd2017 == 2)
-retention_raw <- read_csv("retention.csv") %>% clean_names() %>% select(-x33) %>% 
-  filter(unit_id %in% institution$unit_id) %>% 
-  gather(key = year, value = full, contains("ret_pcf_ef")) %>% 
-  gather(key = part_year, value = part, contains("ret_pcp_ef")) %>% 
-  gather(key = exclusive_year, value = exclusive, contains("pctdeexc_drvef")) %>% 
-  gather(key = some_year, value = some, contains("pctdesom_drvef")) %>% 
-  gather(key = none_year, value = none, contains("pctdenon_drvef")) %>% 
-  unique() %>% 
-  mutate(full_year = str_extract(full_year, one_or_more(DGT)),
-         part_year = str_extract(part_year, one_or_more(DGT)),
-         exclusive_year = str_extract(exclusive_year, one_or_more(DGT)),
-         some_year = str_extract(some_year, one_or_more(DGT)),
-         none_year = str_extract(none_year, one_or_more(DGT))) #takes a while (~10 mins)
+  mutate(full_year = str_extract(full_year, "201" %R% DGT),
+         part_year = str_extract(part_year, "201" %R% DGT),
+         exclusive_year = str_extract(exclusive_year, "201" %R% DGT),
+         some_year = str_extract(some_year, "201" %R% DGT),
+         none_year = str_extract(none_year, "201" %R% DGT)) %>% #takes a while (~10 mins)
+  filter(full_year == part_year, part_year == exclusive_year, exclusive_year == some_year, some_year == none_year)
 ```
 
 ```{r sample}
@@ -60,4 +43,14 @@ retention_sample <- sample_n(retention_raw, 1e6)
 ```{r}
 retention_sample %>% ggplot(aes(x = full, y = none, group = full_year)) + geom_point(alpha = .4)
 ```
+
+##Financial Statements
+
+```{r financials_import}
+for_profit <- rbind(read_csv("finance_profit_current"), read_csv("finance_profit_historical")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
+private <- rbind(read_csv("finance_private_current"), read_csv("finance_private_current")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
+public <- rbind(read_csv("finance_public_current"), read_csv("finance_public_historical1"), read_csv("finance_public_historical2")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
+```
+
+ko
 
