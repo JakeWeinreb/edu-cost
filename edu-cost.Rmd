@@ -15,6 +15,7 @@ library(tidyverse)
 library(janitor)
 library(readr)
 library(rebus)
+library(googlesheets)
 ```
 
 ## Distance Education
@@ -78,6 +79,16 @@ public <- bind_cols(read_csv("finance_public_current.csv"), read_csv("finance_pu
 ```
 
 ```{r sums}
-for_profit %>% summarize_if(is.numeric, sum, na.rm = TRUE) %>% 
+#add up each column and transpose
+for_profit_clean <- for_profit %>% summarize_if(is.numeric, sum, na.rm = TRUE) %>% t()
+private_clean <- private %>% summarize_if(is.numeric, sum, na.rm = TRUE) %>% t()
+public_clean <- public %>% summarize_if(is.numeric, sum, na.rm = TRUE) %>% t()
+```
+
+```{r sheets_export}
+#have to log in if not already
+gs_title("ed_financials") %>% gs_ws_new(ws_title = "for_profit", input = for_profit_clean)
+gs_title("ed_financials") %>% gs_ws_new(ws_title = "private", input = private_clean)
+gs_title("ed_financials") %>% gs_ws_new(ws_title = "public", input = public_clean)
 ```
 
