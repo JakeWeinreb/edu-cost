@@ -73,16 +73,20 @@ retention_raw %>% ggplot(aes(x = full, y = none, group = full_year)) + geom_poin
 ##Financial Statements
 
 ```{r financials_import}
-for_profit <- bind_cols(read_csv("finance_profit_current.csv"), read_csv("finance_profit_historical.csv")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
-private <- bind_cols(read_csv("finance_private_current.csv"), read_csv("finance_private_current.csv")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
-public <- bind_cols(read_csv("finance_public_current.csv"), read_csv("finance_public_historical1.csv"), read_csv("finance_public_historical2.csv")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
+for_profit <- read_csv("finance_profit.csv") %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
+private <- bind_cols(read_csv("finance_private_current.csv"), read_csv("finance_private_historical.csv")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
+public <- bind_cols(read_csv("finance_public_current.csv"), read_csv("finance_public_historical.csv")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
 ```
 
 ```{r sums}
 #add up each column and transpose
-for_profit_clean <- for_profit %>% summarize_if(is.numeric, sum, na.rm = TRUE) %>% t()
-private_clean <- private %>% summarize_if(is.numeric, sum, na.rm = TRUE) %>% t()
-public_clean <- public %>% summarize_if(is.numeric, sum, na.rm = TRUE) %>% t()
+add_n_transpose <- function(df){
+  df %>% summarize_if(is.numeric, sum, na.rm = TRUE) %>% rename_all(~str_remove(., "_f" %R% one_or_more("[:alnum:]") %R% END)) %>% t() %>% as.data.frame %>% rownames_to_column()
+}
+  
+for_profit_clean <- for_profit %>% add_n_transpose()
+private_clean <- private %>% add_n_transpose()
+public_clean <- public %>% add_n_transpose()
 ```
 
 ```{r sheets_export}
