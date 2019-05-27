@@ -37,7 +37,7 @@ retention_raw <- read_csv("retention.csv") %>% clean_names() %>% select(-x33) %>
   filter(full_year == part_year, part_year == exclusive_year, exclusive_year == some_year, some_year == none_year)
 ```
 
-Remote classwork has clearly become more popular over time, with the average percentage of students taking some or all remote classes rises.
+Remote classwork has clearly become more popular over time, with the average percentage of students taking some or all remote classes rising.
 
 ```{r remote_over_time}
 online_over_time <- retention_raw %>% select(full_year, exclusive, some, none) %>% group_by(full_year) %>%
@@ -46,10 +46,19 @@ online_over_time <- retention_raw %>% select(full_year, exclusive, some, none) %
             avg_none = mean(none, na.rm = TRUE)) %>% 
   gather(key = cat, value = avg, -full_year) 
 
-online_over_time %>% ggplot(aes(full_year, avg, color = cat, group = cat)) + geom_point() + geom_line()
+online_over_time %>% ggplot(aes(full_year, avg, color = cat, group = cat)) + 
+  geom_point() + 
+  geom_line() +
+  scale_color_manual(values = c("#AC2937", "#272C2F", "#808080"),
+                     name = "",
+                     breaks = c("avg_exclusive", "avg_some", "avg_none"),
+                     labels = c("Exclusive", "Some", "None")) +
+  theme_minimal() +
+  scale_y_continuous(labels = function(x) str_c(x, "%")) +
+  labs(x = "", y = "", title = "Average percent of students studying remotely")
 ```
 
-Numer of remote only has been on the rise, while the number not offering a remote option has fallen by ____%
+Number of remote only has been on the rise, while the number not offering a remote option has fallen by ____%
 
 ```{r num_remote}
 num_remote <- retention_raw %>% select(full_year, exclusive, none) %>% 
@@ -64,15 +73,17 @@ num_remote %>% ggplot(aes(full_year, n, fill = cat)) + geom_col(position = 'dodg
 
 I was curious if this trend will have an impact on retention rates, or if switching costs are reduced when there is no tether to the physical location of the school.  The charts below validate this intuition, at least historically.  There is a clear negative relationship between retention rate and percentage of students taking remote coursework, and the pattern is consistent across time.
 
-This data isn't perfect, however.  It shows the percentage of students for each university take remote classes, which could introduce bias as schools with more remote classes could have confounding factors that cause them to have lower retention.  In other words, we don't know whether the students leaving the school are the ones taking online classes or not.  What we would ideally want would be data on individual students at a given university and whether there is a relationship between those taking online courses and retention.
-
 ```{r comparison_over_time}
 retention_raw %>% ggplot(aes(x = full, y = none, group = full_year)) + geom_point(alpha = .3) + facet_wrap(~full_year)
 ```
 
+This data isn't perfect, however.  It shows the percentage of students for each university that take remote classes, which could introduce bias as schools with more remote classes could have confounding factors that cause them to have lower retention.  In other words, this doesn't show whether the students leaving the school are the ones taking online classes or not.  What we would ideally want would be data on individual students at a given university and whether there is a relationship between those taking online courses and retention.
+
 ##Financial Statements
 
+
 ```{r financials_import}
+#reading from personal drive
 for_profit <- read_csv("finance_profit.csv") %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
 private <- bind_cols(read_csv("finance_private_current.csv"), read_csv("finance_private_historical.csv")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
 public <- bind_cols(read_csv("finance_public_current.csv"), read_csv("finance_public_historical.csv")) %>% clean_names() %>% filter(unit_id %in% institution$unit_id)
