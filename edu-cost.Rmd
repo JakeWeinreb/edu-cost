@@ -10,6 +10,8 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FAL
 knitr::opts_knit$set(root.dir = "/Users/jakeweinreb/Desktop/R/Data/Education/")
 ```
 
+The nature of higher education is changing.  
+
 ```{r libraries}
 library(tidyverse)
 library(janitor)
@@ -19,6 +21,8 @@ library(googlesheets)
 ```
 
 ## Distance Education
+
+Technology has enabled 
 
 ```{r upload}
 institution <- read_csv("institution.csv") %>% clean_names() %>% filter(instcat_hd2017 == 2)
@@ -68,7 +72,15 @@ num_remote <- retention_raw %>% select(full_year, exclusive, none) %>%
   group_by(full_year, cat) %>% 
   tally()
 
-num_remote %>% ggplot(aes(full_year, n, fill = cat)) + geom_col(position = 'dodge')
+num_remote %>% ggplot(aes(full_year, n, fill = cat)) + 
+  geom_col(position = 'dodge') +
+  scale_fill_manual(values = c("#AC2937", "#808080"),
+                     name = "",
+                     breaks = c("exclusive", "none"),
+                     labels = c("Exclusively remote", "No remote option")) +
+  theme_minimal() +
+  labs(x = "", y = "Number of schools", title = "Remote only schools are on the rise")
+  
 ```
 
 I was curious if this trend will have an impact on retention rates, or if switching costs are reduced when there is no tether to the physical location of the school.  The charts below validate this intuition, at least historically.  There is a clear negative relationship between retention rate and percentage of students taking remote coursework, and the pattern is consistent across time.
