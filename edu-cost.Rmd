@@ -10,8 +10,6 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FAL
 knitr::opts_knit$set(root.dir = "/Users/jakeweinreb/Desktop/R/Data/Education/")
 ```
 
-The nature of higher education is changing.  
-
 ```{r libraries}
 library(tidyverse)
 library(janitor)
@@ -20,9 +18,15 @@ library(rebus)
 library(googlesheets)
 ```
 
+The nature of higher education is changing.  Technology has enabled remote learning, allowing high quality education to be delivered at scale.  While sufficiently advanced technology for this task has existed for several years, we continue to see a cultural shift toward acceptance and use of the newfound capabilities.  
+
+In this brief report, I take a look at trends and implications of distance education.  I then build aggregate financial statements for US colleges and universities to understand the current business model of higher education.  This serves as a comparison point for innovative new business models that can take advantage of the current paradigm shift.
+
 ## Distance Education
 
-Technology has enabled 
+The future of learning is remote.  From improvements in video chat quality/reliability to messaging to feature-rich online learning environments, distance education is already arguably a better way to learn.
+
+To understand adoption trends, I gathered a dataset from the National Center of Education Statistics consisting of various descriptive qualities and outcome measures for every college and university in the United States.  
 
 ```{r upload}
 institution <- read_csv("institution.csv") %>% clean_names() %>% filter(instcat_hd2017 == 2)
@@ -41,7 +45,7 @@ retention_raw <- read_csv("retention.csv") %>% clean_names() %>% select(-x33) %>
   filter(full_year == part_year, part_year == exclusive_year, exclusive_year == some_year, some_year == none_year)
 ```
 
-Remote classwork has clearly become more popular over time, with the average percentage of students taking some or all remote classes rising.
+It's immediately clear that remote classwork has become more popular over time.  From 2012 to 2017, the average percentage of students taking some or all remote classes has risen from 20% to 30%.
 
 ```{r remote_over_time}
 online_over_time <- retention_raw %>% select(full_year, exclusive, some, none) %>% group_by(full_year) %>%
@@ -62,7 +66,7 @@ online_over_time %>% ggplot(aes(full_year, avg, color = cat, group = cat)) +
   labs(x = "", y = "", title = "Average percent of students studying remotely")
 ```
 
-Number of remote only has been on the rise, while the number not offering a remote option has fallen by ____%
+This increased adoption at schools offering a remote option has encouraged the creation of a number of remote-only institutions while reducing the number of schools that don't provide the option at all. From 2012-2017, the number of schools not offering a distance option has declined from 558 to 412---a 26% drop.  Meanwhile, the number of distance-only institutions has risen from 28 to 45, an increase of 61%.
 
 ```{r num_remote}
 num_remote <- retention_raw %>% select(full_year, exclusive, none) %>% 
@@ -79,20 +83,31 @@ num_remote %>% ggplot(aes(full_year, n, fill = cat)) +
                      breaks = c("exclusive", "none"),
                      labels = c("Exclusively remote", "No remote option")) +
   theme_minimal() +
-  labs(x = "", y = "Number of schools", title = "Remote only schools are on the rise")
+  labs(x = "", y = "Number of schools", title = "Remote schooling is on the rise")
   
 ```
 
-I was curious if this trend will have an impact on retention rates, or if switching costs are reduced when there is no tether to the physical location of the school.  The charts below validate this intuition, at least historically.  There is a clear negative relationship between retention rate and percentage of students taking remote coursework, and the pattern is consistent across time.
+I think it's fair to say that schools are starting to get the picture.
+
+I was curious if this trend would have an impact on retention rates.  The charts below validate this intuition, at least historically.  There is a clear negative relationship between retention rate and percentage of students taking remote coursework, and the pattern is consistent across time.  My hypothesis is that switching costs are reduced when there is no tether to the physical location of the school.
 
 ```{r comparison_over_time}
-retention_raw %>% ggplot(aes(x = full, y = none, group = full_year)) + geom_point(alpha = .3) + facet_wrap(~full_year)
+retention_raw %>% ggplot(aes(x = full, y = none, group = full_year)) + 
+  geom_point(alpha = .3) + 
+  facet_wrap(~full_year) +
+  theme_minimal() +
+  labs(x = "Retention", y = "Percent Taking In-Person Classes", title = "Remote schooling leads to lower retention") +
+  scale_y_continuous(labels = function(x) str_c(x, "%")) +
+  scale_x_continuous(labels = function(x) str_c(x, "%"))
 ```
 
 This data isn't perfect, however.  It shows the percentage of students for each university that take remote classes, which could introduce bias as schools with more remote classes could have confounding factors that cause them to have lower retention.  In other words, this doesn't show whether the students leaving the school are the ones taking online classes or not.  What we would ideally want would be data on individual students at a given university and whether there is a relationship between those taking online courses and retention.
 
 ##Financial Statements
 
+Remote learning may also call into question the business model most traditional higher education institutions rely upon.  If teaching can scale without a drop in quality, new and better business models can be created to better align incentives.  
+
+Here I take a look at the makeup of current higher education business models.  Using the IPEDS data, I created financial statements going back 5 years for all for-profit, private, and public schools in the US, respectively.  The full financial statements can be found at: https://docs.google.com/spreadsheets/d/14IdZzKzizY5vH88ldkZKJoLvQW1fP2KE_yFkKff506Y/edit?usp=sharing
 
 ```{r financials_import}
 #reading from personal drive
@@ -118,4 +133,16 @@ gs_title("ed_financials") %>% gs_ws_new(ws_title = "for_profit", input = for_pro
 gs_title("ed_financials") %>% gs_ws_new(ws_title = "private", input = private_clean)
 gs_title("ed_financials") %>% gs_ws_new(ws_title = "public", input = public_clean)
 ```
+
+A few notable observations from the financials:
+
+*Public schools are receiving less federal aid, dropping from 10.14% of total revenue in 2012 to 8.37% in 2017.  This is partially being made up for by hospital revenue, which has grown from 12.14% of total revenue to 14.41% in that same time.  Public schools have also dipped into their research budgets, cutting research expenses from 13.16% of revenues to 11.66% over the 5-year time period.
+*Private school incomes can vary wildly year-to-year depending on endowment investment income.  In 2013/14 investment income comprised 25% of total revenues, while in 2015/16 it contributed -1.55%.  This is a huge swing factor for overall net margins, which have been anywhere between +25% and -3%.  This is compared to public schools and for-profit schools both with a margin variance of ~4%.  Unlike public and for-profit schools, private schools typically run a net loss when looking at net income ex investment income.
+*For-profit schools earn the vast majority (90+%) of their revenue from tuition and fees, as opposed to public and private schools that have more balanced revenue sources.  They also spend far less on instructor salaries and research and far more on student services and institutional support.  To me, this says that public colleges and universities are optimizing for learning and prestige, while for-profit schools are optimizing for student success.  For-profit schools are often looked down upon for their lack of incentive alignment (i.e. because they're profit-motivated), but perhaps conventional wisdom has that one wrong.
+
+
+This analysis barely scratches the surface of the available data.  
+
+
+
 
