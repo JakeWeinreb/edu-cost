@@ -1,6 +1,6 @@
 ---
-title: "Distance Education and Business Models"
-subtitle: "What does the future of education look like?"
+title: "What does the future of education look like?"
+subtitle: "A review of distance education and business models"
 author: "Jake Weinreb"
 date: "5/31/2019"
 output:
@@ -9,7 +9,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE, message = FALSE)
 knitr::opts_knit$set(root.dir = "/Users/jakeweinreb/Desktop/R/Data/Education/")
 ```
 
@@ -136,11 +136,15 @@ public_clean <- public %>% add_n_transpose()
 #gs_title("ed_financials") %>% gs_ws_new(ws_title = "public", input = public_clean)
 ```
 
+```{r pic, out.width = "300px", fig.align='center', fig.cap='Comparison of common-sized income statements'}
+knitr::include_graphics("/Users/jakeweinreb/Desktop/ed_financials.png") 
+```
+
 A few notable observations from the financials:
 
-*Public schools are receiving less federal aid, dropping from 10.14% of total revenue in 2012 to 8.37% in 2017.  This is partially being made up for by hospital revenue, which has grown from 12.14% of total revenue to 14.41% in that same time.  Public schools have also dipped into their research budgets, cutting research expenses from 13.16% of revenues to 11.66% over the 5-year time period.
-*Private school incomes can vary wildly year-to-year depending on endowment investment income.  In 2013/14 investment income comprised 25% of total revenues, while in 2015/16 it contributed -1.55%.  This is a huge swing factor for overall net margins, which have been anywhere between +25% and -3%.  This is compared to public schools and for-profit schools both with a margin variance of ~4%.  Unlike public and for-profit schools, private schools typically run a net loss when looking at net income ex-investment income.
-*For-profit schools earn the vast majority (90+%) of their revenue from tuition and fees, as opposed to public and private schools that have more balanced revenue sources.  They also spend far less on instructor salaries and research and far more on student services and institutional support.  To me, this says that public colleges and universities are optimizing for learning and prestige, while for-profit schools are optimizing for student success.  For-profit schools are often looked down upon for their lack of incentive alignment (i.e. because they're profit-motivated), but perhaps conventional wisdom has that one wrong.
+* Public schools are receiving less federal aid, dropping from 10.14% of total revenue in 2012 to 8.37% in 2017.  This is partially being made up for by hospital revenue, which has grown from 12.14% of total revenue to 14.41% in that same time.  Public schools have also dipped into their research budgets, cutting research expenses from 13.16% of revenues to 11.66% over the 5-year time period.
+* Private school incomes can vary wildly year-to-year depending on endowment investment income.  In 2013/14 investment income comprised 25% of total revenues, while in 2015/16 it contributed -1.55%.  This is a huge swing factor for overall net margins, which have been anywhere between +25% and -3%.  This is compared to public schools and for-profit schools both with a margin variance of ~4%.  Unlike public and for-profit schools, private schools typically run a net loss when looking at net income ex-investment income.
+* For-profit schools earn the vast majority (90+%) of their revenue from tuition and fees, as opposed to public and private schools that have more balanced revenue sources.  They also spend far less on instructor salaries and research and far more on student services and institutional support.  To me, this says that public colleges and universities are optimizing for learning and prestige, while for-profit schools are optimizing for student success.  For-profit schools are often looked down upon for their lack of incentive alignment (i.e. because they're profit-motivated), but perhaps conventional wisdom has that one wrong.
 
 
 This analysis barely scratches the surface of the available data.  We could change the segmentation of the aggregated financials to distance vs. in-person institutions to investigate whether the scale effects show up prominently.  We could also look at which school type---for profit, private, or public---utilizes distance education most (and most effectively).  We could dig deeper into the relationship between school characteristics and outcome measures for each of these schools to ultimately build a model for predicting student success.  
