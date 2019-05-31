@@ -1,3 +1,3 @@
 # edu-cost
 
-A look at the explicit and implicit costs of higher education.
+A look at the changing nature of higher education
