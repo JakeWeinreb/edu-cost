@@ -1,8 +1,11 @@
 ---
-title: "edu-cost"
+title: "Distance Education and Business Models"
+subtitle: "What does the future of education look like?"
 author: "Jake Weinreb"
-date: "5/9/2019"
-output: html_document
+date: "5/31/2019"
+output:
+  html_document:
+    theme: cosmo
 ---
 
 ```{r setup, include=FALSE}
@@ -127,9 +130,10 @@ public_clean <- public %>% add_n_transpose()
 
 ```{r sheets_export}
 #have to log in if not already
-gs_title("ed_financials") %>% gs_ws_new(ws_title = "for_profit", input = for_profit_clean)
-gs_title("ed_financials") %>% gs_ws_new(ws_title = "private", input = private_clean)
-gs_title("ed_financials") %>% gs_ws_new(ws_title = "public", input = public_clean)
+#ran this on initial creation, but only need to run it once
+#gs_title("ed_financials") %>% gs_ws_new(ws_title = "for_profit", input = for_profit_clean)
+#gs_title("ed_financials") %>% gs_ws_new(ws_title = "private", input = private_clean)
+#gs_title("ed_financials") %>% gs_ws_new(ws_title = "public", input = public_clean)
 ```
 
 A few notable observations from the financials:
